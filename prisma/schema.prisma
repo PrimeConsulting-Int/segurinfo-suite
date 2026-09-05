@@ -1,0 +1,180 @@
+// Prisma schema — SGSI (ISO 27001/27002/27005/27017/27018/27031/27032/27035/27701)
+// SQLite no soporta enums nativos: todos los campos categóricos son String,
+// validados en lib/enums.ts
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Asset {
+  id           String   @id @default(cuid())
+  name         String
+  type         String
+  owner        String
+  criticality  String // Bajo | Medio | Alto | Crítico
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  risks              Risk[]
+  incidentesAfectados Incident[] @relation("IncidentAssets")
+}
+
+model Risk {
+  id          String   @id @default(cuid())
+  code        String   @unique // R-001, R-002...
+  title       String
+  category    String // categoría de riesgo
+  assetId     String?
+  asset       Asset?   @relation(fields: [assetId], references: [id], onDelete: SetNull)
+
+  causa          String?
+  vulnerabilidad String?
+  amenaza        String?
+
+  probabilidad     Int // 1-5
+  impacto          Int // 1-5
+  nivelInherente   Int // calculado = probabilidad * impacto
+
+  tratamiento String // Mitigar | Aceptar | Transferir | Evitar
+
+  probabilidadResidual Int?
+  impactoResidual      Int?
+  nivelResidual        Int? // calculado si hay residual
+
+  estado      String // Abierto | En tratamiento | Monitoreo | Cerrado
+  responsable String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  controles  Control[]   @relation("RiskControls")
+  indicadores Indicator[]
+  incidentes  Incident[]
+}
+
+// Catálogo de controles / prácticas de referencia (SoA)
+model Control {
+  id       String  @id @default(cuid())
+  code     String  @unique
+  title    String
+  family   String // "27001-ANEXO_A" | "27017-CLD" | "27018-ANEXO_A" | "27701-ANEXO_A" | "27701-ANEXO_B" | "27031-PRACTICA" | "27032-PRACTICA"
+  anexoACategoria String? // Organizacional | Personas | Físico | Tecnológico (solo familia 27001-ANEXO_A)
+  principio29100  String? // solo familia 27018-ANEXO_A
+  clausula        String? // solo familias 27701-*
+  proceso27031    String? // solo familia 27031-PRACTICA (fase del ciclo PDCA)
+  practica27032   String? // solo familia 27032-PRACTICA (tipo de práctica)
+
+  appliesTo27017 Boolean @default(false) // control base de Anexo A aplicable a servicios en la nube
+  appliesTo27018 Boolean @default(false) // control base de Anexo A relevante para PII en nube pública
+  appliesTo27701 Boolean @default(false) // control base de Anexo A relevante para PIMS
+  isPractice     Boolean @default(false) // true => 27031/27032, no es Anexo A certificable
+
+  // --- Implementación editable ---
+  aplicable    Boolean  @default(true)
+  estado       String   @default("No iniciado") // No iniciado | En progreso | Implementado | No aplica
+  madurez      Int?     // 1-5: qué tan implementado está el control
+  efectividad  Int?     // 1-5: qué tan efectivo es el control en la práctica (evaluación operativa, distinta de madurez)
+  responsable  String?
+  justificacion String?
+  evidencia    String?
+  fechaRevision DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  riesgos Risk[] @relation("RiskControls")
+}
+
+model RiskAppetite {
+  id                 String   @id @default(cuid())
+  category           String   @unique
+  statement          String
+  appetiteThreshold  Int // 1-25
+  toleranceThreshold Int // 1-25, >= appetite
+  responsable        String?
+  approvedDate       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Indicator {
+  id          String  @id @default(cuid())
+  code        String  @unique // IND-001...
+  tipo        String // KPI | KRI
+  nombre      String
+  descripcion String?
+  unidad      String?
+  direccion   String // mayor_es_mejor | menor_es_mejor
+  meta            Float
+  umbralAlerta    Float
+  umbralCritico   Float
+  frecuencia  String // Diaria | Semanal | Mensual | Trimestral | Anual
+  responsable String?
+
+  riskId String?
+  risk   Risk?   @relation(fields: [riskId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mediciones Measurement[]
+}
+
+model Measurement {
+  id          String   @id @default(cuid())
+  indicatorId String
+  indicator   Indicator @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  fecha       DateTime
+  valor       Float
+  nota        String?
+
+  createdAt DateTime @default(now())
+}
+
+model Incident {
+  id        String  @id @default(cuid())
+  code      String  @unique // INC-001...
+  title     String
+  description String?
+  categoria String // Malware | Phishing | Fuga de datos | Denegación de servicio | Acceso no autorizado | Físico | Otro
+  severidad String // Baja | Media | Alta | Crítica
+  estado    String // Abierto | En investigación | Contenido | Resuelto | Cerrado
+
+  fechaDeteccion  DateTime
+  fechaResolucion DateTime?
+
+  causaRaiz          String?
+  leccionesAprendidas String?
+
+  riskId String?
+  risk   Risk?   @relation(fields: [riskId], references: [id], onDelete: SetNull)
+
+  activos Asset[] @relation("IncidentAssets")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContinuityPlan {
+  id     String @id @default(cuid())
+  nombre String
+  alcance String?
+  rto    String? // Recovery Time Objective
+  rpo    String? // Recovery Point Objective
+  estrategia String?
+  estado String // Borrador | Aprobado | Probado | Desactualizado
+
+  fechaUltimaPrueba  DateTime?
+  fechaProximaPrueba DateTime?
+  responsable        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
