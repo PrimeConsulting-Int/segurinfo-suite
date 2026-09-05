@@ -66,7 +66,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-bold">Dashboard del SGSI</h1>
+        <h1 className="text-xl font-bold">Dashboard de SegurInfo Suite</h1>
         <p className="text-sm text-gray-500">Vista integrada de cumplimiento, riesgo, monitoreo e incidentes.</p>
       </div>
 

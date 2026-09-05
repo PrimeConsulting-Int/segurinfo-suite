@@ -29,7 +29,7 @@ export default function Nav() {
       </div>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-1 px-4 py-3 sm:px-6">
         <Link href="/dashboard" className="mr-6 flex items-baseline gap-2">
-          <span className="font-display text-xl font-semibold tracking-tight text-brand-900">SGSI</span>
+          <span className="font-display text-xl font-semibold tracking-tight text-brand-900">SegurInfo Suite</span>
           <span className="rounded-sm bg-brand-900 px-1.5 py-0.5 font-mono text-[9px] font-medium uppercase tracking-widest text-gold-300">
             Seguridad de la Información
           </span>

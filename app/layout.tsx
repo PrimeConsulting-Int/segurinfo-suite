@@ -20,7 +20,7 @@ const mono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SGSI — Sistema de Gestión de Seguridad de la Información",
+  title: "SegurInfo Suite — Sistema de Gestión de Seguridad de la Información",
   description:
     "Identificación, evaluación, tratamiento y monitoreo de riesgos de seguridad de la información, ciberseguridad y privacidad.",
 };

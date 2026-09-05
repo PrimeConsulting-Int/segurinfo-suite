@@ -1,4 +1,4 @@
-# SGSI — Sistema de Gestión de Seguridad de la Información
+# SegurInfo Suite — Sistema de Gestión de Seguridad de la Información
 
 Herramienta web funcional para identificar, evaluar, tratar y monitorear
 riesgos de seguridad de la información, ciberseguridad y privacidad, alineada
