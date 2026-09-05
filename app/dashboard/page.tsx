@@ -70,23 +70,23 @@ export default async function DashboardPage() {
         <p className="text-sm text-gray-500">Vista integrada de cumplimiento, riesgo, monitoreo e incidentes.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">% cumplimiento SoA</p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="card p-3">
+          <p className="text-xs text-gray-500">% cumplimiento SoA</p>
           <p className="stat-num">{soa.percentage}%</p>
           <Link href="/controles" className="text-xs text-brand-600 hover:underline">
             Ver controles →
           </Link>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">Riesgos que exceden tolerancia</p>
+        <div className="card p-3">
+          <p className="text-xs text-gray-500">Riesgos que exceden tolerancia</p>
           <p className="stat-num text-red-600">{risksExceedingTolerance.length}</p>
           <Link href="/apetito" className="text-xs text-brand-600 hover:underline">
             Ver apetito →
           </Link>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">Incidentes abiertos / críticos</p>
+        <div className="card p-3">
+          <p className="text-xs text-gray-500">Incidentes abiertos / críticos</p>
           <p className="stat-num text-orange-600">
             {openIncidents.length} / {criticalIncidents.length}
           </p>
@@ -94,8 +94,8 @@ export default async function DashboardPage() {
             Ver incidentes →
           </Link>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">Planes de continuidad</p>
+        <div className="card p-3">
+          <p className="text-xs text-gray-500">Planes de continuidad</p>
           <p className="stat-num">{plans.length}</p>
           <Link href="/continuidad" className="text-xs text-brand-600 hover:underline">
             Ver continuidad →
