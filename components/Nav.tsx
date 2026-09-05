@@ -43,14 +43,11 @@ export default function Nav() {
                 href={l.href}
                 className={
                   active
-                    ? "relative rounded-md px-3 py-1.5 text-sm font-medium text-brand-900"
-                    : "relative rounded-md px-3 py-1.5 text-sm font-medium text-brand-500 hover:bg-brand-50 hover:text-brand-900"
+                    ? "rounded-md border-b-2 border-gold-500 px-3 py-1.5 text-sm font-medium text-brand-900"
+                    : "rounded-md border-b-2 border-transparent px-3 py-1.5 text-sm font-medium text-brand-500 hover:bg-brand-50 hover:text-brand-900"
                 }
               >
                 {l.label}
-                {active && (
-                  <span className="absolute inset-x-2 -bottom-[13px] h-[2px] rounded-full bg-gold-500" />
-                )}
               </Link>
             );
           })}
